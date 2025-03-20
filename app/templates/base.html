@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classificateur d'Iris - {% block title %}{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Particle.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    {% load static %}
+    
+        <style>
+            :root {
+                --primary: #8e44ad;
+                --secondary: #2ecc71;
+                --dark: #2c3e50;
+                --light: #ecf0f1;
+                --danger: #e74c3c;
+                --warning: #f39c12;
+                --gray-100: #f8f9fa;
+                --gray-200: #e9ecef;
+                --gray-800: #343a40;
+              }
+              
+              body {
+                font-family: 'Poppins', sans-serif;
+                background-color: #f5f5f5;
+                color: var(--dark);
+                line-height: 1.6;
+              }
+              
+              /* Animation d'entrée */
+              @keyframes fadeInUp {
+                from {
+                  opacity: 0;
+                  transform: translateY(20px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+              
+              .animated {
+                animation: fadeInUp 0.5s ease-out forwards;
+              }
+              
+              .animation-delay-100 { animation-delay: 0.1s; }
+              .animation-delay-200 { animation-delay: 0.2s; }
+              .animation-delay-300 { animation-delay: 0.3s; }
+              
+              /* Header */
+              .site-header {
+                background: linear-gradient(135deg, var(--primary) 0%, #9b59b6 100%);
+                color: white;
+                padding: 2rem 0;
+                margin-bottom: 2rem;
+              }
+              
+              .header-content {
+                position: relative;
+                z-index: 1;
+              }
+              
+              .header-content h1 {
+                font-weight: 700;
+                letter-spacing: -0.5px;
+              }
+              
+              .header-content p {
+                opacity: 0.9;
+                max-width: 600px;
+              }
+              
+              /* Effet particules */
+              .particles {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                z-index: 0;
+              }
+              
+              /* Cards */
+              .card {
+                border: none;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+                transition: all 0.3s ease;
+                overflow: hidden;
+                margin-bottom: 1.5rem;
+              }
+              
+              .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+              }
+              
+              .card-header {
+                font-weight: 600;
+                padding: 1.2rem 1.5rem;
+                border-bottom: none;
+              }
+              
+              .card-body {
+                padding: 1.5rem;
+              }
+              
+              .bg-primary {
+                background-color: var(--primary) !important;
+              }
+              
+              .bg-success {
+                background-color: var(--secondary) !important;
+              }
+              
+              .bg-info {
+                background-color: #1abc9c !important;
+              }
+              
+              .border-primary {
+                border-color: var(--primary) !important;
+              }
+              
+              .border-success {
+                border-color: var(--secondary) !important;
+              }
+              
+              .border-danger {
+                border-color: var(--danger) !important;
+              }
+              
+              /* Form controls */
+              .form-control, .form-select {
+                padding: 0.75rem 1rem;
+                border-radius: 8px;
+                border: 1px solid var(--gray-200);
+                font-size: 0.95rem;
+                transition: all 0.2s ease;
+              }
+              
+              .form-control:focus, .form-select:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.15);
+              }
+              
+              .form-label {
+                font-weight: 500;
+                margin-bottom: 0.5rem;
+                color: var(--gray-800);
+              }
+              
+              .form-text {
+                color: #6c757d;
+                font-size: 0.85rem;
+              }
+              
+              /* Buttons */
+              .btn {
+                padding: 0.65rem 1.5rem;
+                border-radius: 8px;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                text-transform: uppercase;
+                font-size: 0.85rem;
+                letter-spacing: 0.5px;
+              }
+              
+              .btn-lg {
+                padding: 0.75rem 1.75rem;
+              }
+              
+              .btn-primary {
+                background-color: var(--primary);
+                border-color: var(--primary);
+              }
+              
+              .btn-primary:hover, .btn-primary:focus {
+                background-color: #9b59b6;
+                border-color: #9b59b6;
+                box-shadow: 0 4px 10px rgba(142, 68, 173, 0.3);
+              }
+              
+              .btn-success {
+                background-color: var(--secondary);
+                border-color: var(--secondary);
+              }
+              
+              .btn-success:hover, .btn-success:focus {
+                background-color: #27ae60;
+                border-color: #27ae60;
+                box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+              }
+              
+              .btn-outline-secondary {
+                color: #6c757d;
+                border-color: #ced4da;
+              }
+              
+              .btn-outline-secondary:hover {
+                background-color: #f8f9fa;
+                color: #495057;
+                border-color: #ced4da;
+              }
+              
+              /* Feature cards */
+              .feature-card {
+                text-align: center;
+                padding: 1.5rem;
+                height: 100%;
+                transition: all 0.3s ease;
+                border-radius: 12px;
+                background-color: white;
+              }
+              
+              .feature-card i {
+                margin-bottom: 1rem;
+                font-size: 2.5rem;
+              }
+              
+              .feature-card h5 {
+                margin-bottom: 0.75rem;
+                font-weight: 600;
+              }
+              
+              .feature-icon-primary {
+                color: var(--primary);
+              }
+              
+              .feature-icon-success {
+                color: var(--secondary);
+              }
+              
+              .feature-icon-danger {
+                color: var(--danger);
+              }
+              
+              /* Charts */
+              .chart-container {
+                position: relative;
+                height: 400px;
+                width: 100%;
+              }
+              
+              /* Badge */
+              .badge {
+                padding: 0.5em 0.8em;
+                font-weight: 500;
+                border-radius: 6px;
+              }
+              
+              .badge-primary {
+                background-color: var(--primary);
+              }
+              
+              .badge-success {
+                background-color: var(--secondary);
+              }
+              
+              .badge-danger {
+                background-color: var(--danger);
+              }
+              
+              /* List groups */
+              .list-group-item {
+                padding: 1rem 1.25rem;
+                border-color: var(--gray-200);
+              }
+              
+              /* Alert */
+              .alert {
+                border-radius: 8px;
+                padding: 1rem 1.25rem;
+                border: none;
+              }
+              
+              .alert-success {
+                background-color: rgba(46, 204, 113, 0.15);
+                color: #27ae60;
+              }
+              
+              /* Results box */
+              .result-box {
+                padding: 1.5rem;
+                background-color: white;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+                margin-top: 1.5rem;
+              }
+              
+              .result-title {
+                font-weight: 600;
+                margin-bottom: 1rem;
+                color: var(--dark);
+              }
+              
+              /* Footer */
+              .site-footer {
+                background-color: var(--dark);
+                color: white;
+                padding: 3rem 0;
+                margin-top: 3rem;
+              }
+              
+              .footer-title {
+                font-weight: 600;
+                margin-bottom: 1.25rem;
+                color: white;
+              }
+              
+              .footer-link {
+                color: rgba(255, 255, 255, 0.7);
+                text-decoration: none;
+                transition: color 0.2s ease;
+              }
+              
+              .footer-link:hover {
+                color: white;
+                text-decoration: none;
+              }
+              
+              .footer-list {
+                list-style: none;
+                padding-left: 0;
+                margin-bottom: 0;
+              }
+              
+              .footer-list li {
+                margin-bottom: 0.5rem;
+              }
+              
+              .footer-divider {
+                border-color: rgba(255, 255, 255, 0.1);
+                margin: 2rem 0;
+              }
+              
+              .footer-copyright {
+                color: rgba(255, 255, 255, 0.6);
+                font-size: 0.875rem;
+              }
+              
+              /* Responsive adjustments */
+              @media (max-width: 768px) {
+                .site-header {
+                  padding: 1.5rem 0;
+                }
+                
+                .card-body {
+                  padding: 1.25rem;
+                }
+                
+                .btn {
+                  padding: 0.5rem 1.25rem;
+                }
+                
+                .chart-container {
+                  height: 300px;
+                }
+              }
+        </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="particles" id="particles-js"></div>
+        <div class="container header-content">
+            <div class="row align-items-center">
+                <div class="col-md-8 animated">
+                    <h1 class="mb-2">Classificateur d'Iris</h1>
+                    <p class="lead mb-0">Découvrez la puissance du machine learning appliqué à la classification des iris</p>
+                </div>
+                <div class="col-md-4 text-md-end animated animation-delay-100">
+                    <svg width="120" height="120" viewBox="0 0 500 500" class="d-none d-md-inline-block">
+                        <!-- Logo SVG -->
+                        <circle cx="250" cy="250" r="240" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.6)" stroke-width="3"/>
+                        <path d="M250 250 C190 190, 170 120, 150 50 C120 100, 100 150, 120 210 C140 250, 200 250, 250 250" fill="#9b59b6" />
+                        <path d="M250 250 C310 190, 380 170, 450 150 C400 120, 350 100, 290 120 C250 140, 250 200, 250 250" fill="#2ecc71" />
+                        <path d="M250 250 C190 310, 120 380, 50 450 C100 400, 150 350, 210 330 C250 310, 250 270, 250 250" fill="#e74c3c" />
+                        <circle cx="250" cy="250" r="40" fill="#f39c12" />
+                        <circle cx="250" cy="250" r="25" fill="#2c3e50" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container animated animation-delay-200">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="container my-4 animated animation-delay-300">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5 class="footer-title">À propos du projet</h5>
+                    <p class="mb-0 pe-lg-4">Ce classificateur utilise un Perceptron entraîné sur le célèbre dataset Iris pour prédire l'espèce d'une fleur en fonction de ses caractéristiques mesurées.</p>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6 mb-4 mb-md-0">
+                    <h5 class="footer-title">Dataset</h5>
+                    <ul class="footer-list">
+                        <li><a href="https://scikit-learn.org/stable/datasets/toy_dataset.html#iris-dataset" class="footer-link">Dataset Iris</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Iris_flower_data_set" class="footer-link">Wikipedia</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6 mb-4 mb-md-0">
+                    <h5 class="footer-title">Technologies</h5>
+                    <ul class="footer-list">
+                        <li><a href="https://www.djangoproject.com/" class="footer-link">Django</a></li>
+                        <li><a href="https://scikit-learn.org/" class="footer-link">Scikit-learn</a></li>
+                        <li><a href="https://www.chartjs.org/" class="footer-link">Chart.js</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <h5 class="footer-title">Ressources d'apprentissage</h5>
+                    <ul class="footer-list">
+                        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Perceptron.html" class="footer-link">Documentation Perceptron</a></li>
+                        <li><a href="https://www.kaggle.com/datasets/uciml/iris" class="footer-link">Kaggle Iris Dataset</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="footer-divider">
+            <div class="text-center footer-copyright">
+                &copy; {% now "Y" %} Classificateur d'Iris | Conçu avec Django et Scikit-learn
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Particles config -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#ffffff"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": false,
+                        "anim": {
+                            "enable": false,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 40,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#ffffff",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 1
+                            }
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                    }
+                },
+                "retina_detect": true
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

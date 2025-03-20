@@ -1,0 +1,21 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond circulaire -->
+  <circle cx="250" cy="250" r="240" fill="#f8f9fc" stroke="#4e73df" stroke-width="3"/>
+  
+  <!-- Pétales d'Iris -->
+  <!-- Iris setosa (bleu) -->
+  <path d="M250 250 C190 190, 170 120, 150 50 C120 100, 100 150, 120 210 C140 250, 200 250, 250 250" fill="#4e73df" />
+  
+  <!-- Iris versicolor (vert) -->
+  <path d="M250 250 C310 190, 380 170, 450 150 C400 120, 350 100, 290 120 C250 140, 250 200, 250 250" fill="#1cc88a" />
+  
+  <!-- Iris virginica (rouge) -->
+  <path d="M250 250 C190 310, 120 380, 50 450 C100 400, 150 350, 210 330 C250 310, 250 270, 250 250" fill="#e74a3b" />
+  
+  <!-- Centre de la fleur -->
+  <circle cx="250" cy="250" r="40" fill="#f6c23e" />
+  <circle cx="250" cy="250" r="25" fill="#5a5c69" />
+  
+  <!-- Texte "IRIS CLASSIFIER" -->
+  <text x="250" y="450" text-anchor="middle" font-family="Arial, sans-serif" font-size="38" font-weight="bold" fill="#4e73df">IRIS CLASSIFIER</text>
+</svg>

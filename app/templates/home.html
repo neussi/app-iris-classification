@@ -1,0 +1,560 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <!-- Introduction -->
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm animated">
+            <div class="card-body">
+                <h2 class="card-title h4 mb-4">Le dataset Iris pour le machine learning</h2>
+                <p class="card-text">
+                    Le dataset Iris contient les mesures de 150 iris de trois espèces différentes. 
+                    C'est l'un des jeux de données les plus célèbres en machine learning, utilisé pour les tâches de classification.
+                    Créé par le statisticien Ronald Fisher en 1936, il est devenu une référence pour tester les algorithmes de classification.
+                </p>
+                <div class="row mt-4">
+                    <div class="col-md-4 mb-3">
+                        <div class="feature-card h-100 shadow-sm">
+                            <i class="fas fa-leaf feature-icon-primary"></i>
+                            <h5>Iris Setosa</h5>
+                            <p class="mb-0 text-muted">Fleurs avec pétales courts et sépales larges</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="feature-card h-100 shadow-sm">
+                            <i class="fas fa-seedling feature-icon-success"></i>
+                            <h5>Iris Versicolor</h5>
+                            <p class="mb-0 text-muted">Fleurs de taille moyenne avec caractéristiques modérées</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="feature-card h-100 shadow-sm">
+                            <i class="fas fa-spa feature-icon-danger"></i>
+                            <h5>Iris Virginica</h5>
+                            <p class="mb-0 text-muted">Plus grandes fleurs avec longs pétales et grands sépales</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <!-- Formulaire de prédiction -->
+        <div class="card shadow-sm h-100 animated animation-delay-100">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title h5 mb-0">
+                    <i class="fas fa-microscope me-2"></i>Prédiction d'espèce
+                </h3>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">Entrez les dimensions en centimètres pour classifier l'iris :</p>
+                
+                <form id="prediction-form" method="post" action="{% url 'predict' %}">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ prediction_form.sepal_length.id_for_label }}" class="form-label">
+                                <i class="fas fa-ruler-vertical me-1"></i> {{ prediction_form.sepal_length.label }}
+                            </label>
+                            {{ prediction_form.sepal_length }}
+                            <div class="form-text">Entre 4.3 et 7.9 cm</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ prediction_form.sepal_width.id_for_label }}" class="form-label">
+                                <i class="fas fa-ruler-horizontal me-1"></i> {{ prediction_form.sepal_width.label }}
+                            </label>
+                            {{ prediction_form.sepal_width }}
+                            <div class="form-text">Entre 2.0 et 4.4 cm</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label for="{{ prediction_form.petal_length.id_for_label }}" class="form-label">
+                                <i class="fas fa-ruler-vertical me-1"></i> {{ prediction_form.petal_length.label }}
+                            </label>
+                            {{ prediction_form.petal_length }}
+                            <div class="form-text">Entre 1.0 et 6.9 cm</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ prediction_form.petal_width.id_for_label }}" class="form-label">
+                                <i class="fas fa-ruler-horizontal me-1"></i> {{ prediction_form.petal_width.label }}
+                            </label>
+                            {{ prediction_form.petal_width }}
+                            <div class="form-text">Entre 0.1 et 2.5 cm</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center mt-4">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-magic me-1"></i> Classifier
+                        </button>
+                        <button type="button" id="random-data-btn" class="btn btn-outline-secondary">
+                            <i class="fas fa-random me-1"></i> Exemple aléatoire
+                        </button>
+                    </div>
+                </form>
+                
+                <div id="prediction-results" class="result-box d-none mt-4 animated">
+                    <div class="text-center mb-3">
+                        <span class="badge bg-success px-3 py-2 mb-2">Prédiction réussie</span>
+                        <h4 class="mt-2 mb-1" id="predicted-species">-</h4>
+                        <p class="text-muted small">Classification basée sur les caractéristiques fournies</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h6 class="mb-3">Caractéristiques typiques :</h6>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="p-2 rounded bg-light">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Longueur sépale</span>
+                                        <span id="species-sepal-length" class="badge bg-primary">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 rounded bg-light">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Largeur sépale</span>
+                                        <span id="species-sepal-width" class="badge bg-primary">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 rounded bg-light">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Longueur pétale</span>
+                                        <span id="species-petal-length" class="badge bg-primary">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 rounded bg-light">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Largeur pétale</span>
+                                        <span id="species-petal-width" class="badge bg-primary">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <!-- Explorer les espèces -->
+        <div class="card shadow-sm h-100 animated animation-delay-200">
+            <div class="card-header bg-success text-white">
+                <h3 class="card-title h5 mb-0">
+                    <i class="fas fa-search me-2"></i>Explorer les espèces
+                </h3>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">Sélectionnez une espèce pour visualiser ses caractéristiques moyennes :</p>
+                
+                <form id="species-form" method="post" action="{% url 'species_info_post' %}">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="{{ species_form.species.id_for_label }}" class="form-label">
+                            <i class="fas fa-leaf me-1"></i> {{ species_form.species.label }}
+                        </label>
+                        {{ species_form.species }}
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="fas fa-info-circle me-1"></i> Voir les détails
+                        </button>
+                    </div>
+                </form>
+                
+                <div id="species-info" class="result-box d-none mt-4 animated">
+                    <h5 class="result-title" id="species-title">-</h5>
+                    <p class="text-muted mb-4">Caractéristiques moyennes calculées sur le dataset Iris :</p>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <h6 class="mb-3 text-muted">Sépale</h6>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span><i class="fas fa-arrows-alt-v me-1"></i> Longueur</span>
+                                        <span id="info-sepal-length" class="fw-bold">-</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span><i class="fas fa-arrows-alt-h me-1"></i> Largeur</span>
+                                        <span id="info-sepal-width" class="fw-bold">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <h6 class="mb-3 text-muted">Pétale</h6>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span><i class="fas fa-arrows-alt-v me-1"></i> Longueur</span>
+                                        <span id="info-petal-length" class="fw-bold">-</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span><i class="fas fa-arrows-alt-h me-1"></i> Largeur</span>
+                                        <span id="info-petal-width" class="fw-bold">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button type="button" class="btn btn-sm btn-outline-success use-as-input-btn">
+                            <i class="fas fa-file-import me-1"></i> Utiliser ces valeurs pour prédiction
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Visualisation des données -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm animated animation-delay-300">
+            <div class="card-header bg-info text-white">
+                <h3 class="card-title h5 mb-0">
+                    <i class="fas fa-chart-scatter me-2"></i>Visualisation comparative
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <div class="chart-container">
+                            <canvas id="iris-scatter-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <h5 class="mb-3">Distribution des espèces</h5>
+                        <p class="text-muted mb-4">Ce diagramme montre comment les trois espèces d'iris se différencient selon les caractéristiques sélectionnées.</p>
+                        
+                        <div class="mb-3">
+                            <label for="x-axis" class="form-label">Axe horizontal (X)</label>
+                            <select id="x-axis" class="form-select">
+                                <option value="sepal_length">Longueur du sépale</option>
+                                <option value="sepal_width">Largeur du sépale</option>
+                                <option value="petal_length" selected>Longueur du pétale</option>
+                                <option value="petal_width">Largeur du pétale</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="y-axis" class="form-label">Axe vertical (Y)</label>
+                            <select id="y-axis" class="form-select">
+                                <option value="sepal_length">Longueur du sépale</option>
+                                <option value="sepal_width">Largeur du sépale</option>
+                                <option value="petal_length">Longueur du pétale</option>
+                                <option value="petal_width" selected>Largeur du pétale</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-primary me-2" style="width: 20px; height: 20px;"></span>
+                                <span>Iris Setosa</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-success me-2" style="width: 20px; height: 20px;"></span>
+                                <span>Iris Versicolor</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-danger me-2" style="width: 20px; height: 20px;"></span>
+                                <span>Iris Virginica</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Données pour la visualisation
+    const irisData = {{ species_info|safe }};
+    let scatterChart;
+    
+    // Préparation des données pour le graphique
+    function prepareChartData(xFeature, yFeature) {
+        const datasets = [
+            {
+                label: 'Iris Setosa',
+                backgroundColor: 'rgba(142, 68, 173, 0.7)',
+                borderColor: 'rgba(142, 68, 173, 1)',
+                data: [],
+            },
+            {
+                label: 'Iris Versicolor',
+                backgroundColor: 'rgba(46, 204, 113, 0.7)',
+                borderColor: 'rgba(46, 204, 113, 1)',
+                data: [],
+            },
+            {
+                label: 'Iris Virginica',
+                backgroundColor: 'rgba(231, 76, 60, 0.7)',
+                borderColor: 'rgba(231, 76, 60, 1)',
+                data: [],
+            }
+        ];
+        
+        // Simulons des points en utilisant les statistiques de chaque espèce
+        const speciesNames = ['setosa', 'versicolor', 'virginica'];
+        const numPointsPerSpecies = 30;
+        
+        speciesNames.forEach((species, index) => {
+            const speciesData = irisData[species];
+            const xMean = speciesData.avg_characteristics[xFeature];
+            const yMean = speciesData.avg_characteristics[yFeature];
+            const xRange = (speciesData.max_characteristics[xFeature] - speciesData.min_characteristics[xFeature]) / 2;
+            const yRange = (speciesData.max_characteristics[yFeature] - speciesData.min_characteristics[yFeature]) / 2;
+            
+            for (let i = 0; i < numPointsPerSpecies; i++) {
+                // Générer des points avec une distribution normale autour de la moyenne
+                const x = xMean + (Math.random() - 0.5) * xRange;
+                const y = yMean + (Math.random() - 0.5) * yRange;
+                
+                datasets[index].data.push({x, y});
+            }
+        });
+        
+        return datasets;
+    }
+    
+    // Initialisation du graphique
+    function initChart() {
+        const xFeature = document.getElementById('x-axis').value;
+        const yFeature = document.getElementById('y-axis').value;
+        const ctx = document.getElementById('iris-scatter-chart').getContext('2d');
+        
+        if (scatterChart) {
+            scatterChart.destroy();
+        }
+        
+        scatterChart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: prepareChartData(xFeature, yFeature)
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(44, 62, 80, 0.9)',
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label} (${context.parsed.x.toFixed(1)}, ${context.parsed.y.toFixed(1)})`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: document.querySelector(`#x-axis option[value="${xFeature}"]`).textContent,
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: document.querySelector(`#y-axis option[value="${yFeature}"]`).textContent,
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Générer des données aléatoires pour le formulaire
+    function generateRandomData() {
+        // Choisir aléatoirement une espèce
+        const species = ['setosa', 'versicolor', 'virginica'][Math.floor(Math.random() * 3)];
+        const speciesData = irisData[species];
+        
+        // Générer des valeurs proches des moyennes mais avec un peu de variation
+        function randomValue(min, max) {
+            return min + Math.random() * (max - min);
+        }
+        
+        $('#id_sepal_length').val(randomValue(
+            speciesData.min_characteristics.sepal_length, 
+            speciesData.max_characteristics.sepal_length
+        ).toFixed(1));
+        
+        $('#id_sepal_width').val(randomValue(
+            speciesData.min_characteristics.sepal_width,
+            speciesData.max_characteristics.sepal_width
+        ).toFixed(1));
+        
+        $('#id_petal_length').val(randomValue(
+            speciesData.min_characteristics.petal_length,
+            speciesData.max_characteristics.petal_length
+        ).toFixed(1));
+        
+        $('#id_petal_width').val(randomValue(
+            speciesData.min_characteristics.petal_width,
+            speciesData.max_characteristics.petal_width
+        ).toFixed(1));
+    }
+    
+    // Fonction pour afficher les informations d'une espèce
+    function displaySpeciesInfo(speciesInfo) {
+        $('#species-title').text(`Iris ${speciesInfo.name.charAt(0).toUpperCase() + speciesInfo.name.slice(1)}`);
+        
+        // Afficher les caractéristiques moyennes
+        $('#info-sepal-length').text(speciesInfo.avg_characteristics.sepal_length.toFixed(1) + ' cm');
+        $('#info-sepal-width').text(speciesInfo.avg_characteristics.sepal_width.toFixed(1) + ' cm');
+        $('#info-petal-length').text(speciesInfo.avg_characteristics.petal_length.toFixed(1) + ' cm');
+        $('#info-petal-width').text(speciesInfo.avg_characteristics.petal_width.toFixed(1) + ' cm');
+        
+        $('#species-info').removeClass('d-none');
+    }
+    
+    // Fonction pour afficher le résultat de la prédiction
+    function displayPredictionResult(species, speciesInfo) {
+        // Afficher le nom de l'espèce
+        $('#predicted-species').text(`Iris ${species.charAt(0).toUpperCase() + species.slice(1)}`);
+        
+        // Afficher les caractéristiques typiques
+        $('#species-sepal-length').text(`${speciesInfo.avg_characteristics.sepal_length.toFixed(1)} cm`);
+        $('#species-sepal-width').text(`${speciesInfo.avg_characteristics.sepal_width.toFixed(1)} cm`);
+        $('#species-petal-length').text(`${speciesInfo.avg_characteristics.petal_length.toFixed(1)} cm`);
+        $('#species-petal-width').text(`${speciesInfo.avg_characteristics.petal_width.toFixed(1)} cm`);
+        
+        $('#prediction-results').removeClass('d-none');
+    }
+    
+    // Au chargement de la page
+    $(document).ready(function() {
+        // Initialiser le graphique
+        initChart();
+        
+        // Mettre à jour le graphique quand les axes changent
+        $('#x-axis, #y-axis').change(function() {
+            initChart();
+        });
+        
+        // Soumettre le formulaire de prédiction en AJAX
+        $('#prediction-form').submit(function(e) {
+            e.preventDefault();
+            
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: $(this).serialize(),
+                dataType: 'json',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        displayPredictionResult(response.species, response.species_info);
+                    } else {
+                        alert('Erreur dans le formulaire. Veuillez vérifier les valeurs.');
+                    }
+                },
+                error: function() {
+                    alert('Une erreur est survenue lors de la communication avec le serveur.');
+                }
+            });
+        });
+        
+        // Soumettre le formulaire d'espèce en AJAX
+        $('#species-form').submit(function(e) {
+            e.preventDefault();
+            
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: $(this).serialize(),
+                dataType: 'json',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        displaySpeciesInfo(response.species_info);
+                    } else {
+                        alert('Erreur dans le formulaire.');
+                    }
+                },
+                error: function() {
+                    alert('Une erreur est survenue lors de la communication avec le serveur.');
+                }
+            });
+        });
+        
+        // Générer des données aléatoires
+        $('#random-data-btn').click(function() {
+            generateRandomData();
+        });
+        
+        // Utiliser les caractéristiques d'espèce comme données d'entrée
+        $('.use-as-input-btn').click(function() {
+            const sepalLength = parseFloat($('#info-sepal-length').text());
+            const sepalWidth = parseFloat($('#info-sepal-width').text());
+            const petalLength = parseFloat($('#info-petal-length').text());
+            const petalWidth = parseFloat($('#info-petal-width').text());
+            
+            $('#id_sepal_length').val(sepalLength);
+            $('#id_sepal_width').val(sepalWidth);
+            $('#id_petal_length').val(petalLength);
+            $('#id_petal_width').val(petalWidth);
+            
+            // Faire défiler jusqu'au formulaire de prédiction
+            $('html, body').animate({
+                scrollTop: $('#prediction-form').offset().top - 100
+            }, 400);
+        });
+    });
+</script>
+{% endblock %}
